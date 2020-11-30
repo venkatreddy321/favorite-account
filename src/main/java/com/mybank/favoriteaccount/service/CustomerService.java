@@ -35,7 +35,9 @@ public interface CustomerService {
 	 * Method to call service method to check the customer validation for the given
 	 * customer id and password
 	 * 
-	 * @param customerId id of the customer who is going to log in .
+	 * @param customerId id of the customer who is going to log in
+	 * @param password of the customer who is going to log in
+	 * @param otp sent to the mobile of the customer who is going to log in
 	 * @return responsedto which consist the message ,status code 
 	 */
 	

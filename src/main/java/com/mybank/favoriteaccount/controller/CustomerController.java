@@ -57,6 +57,8 @@ public class CustomerController {
 	 * Method to call service method to get login details for the given customer id and password.
 	 * 
 	 * @param customerId id of the customer who is going to log in .
+	 * @param password of the customer who is going to log in
+	 * @param otp sent to the mobile of the customer who is going to log in
 	 * @return response dto which consist the message ,status code 
 	 * 
 	 */

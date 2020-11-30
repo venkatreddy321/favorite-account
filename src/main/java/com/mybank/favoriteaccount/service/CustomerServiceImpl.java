@@ -130,7 +130,7 @@ public class CustomerServiceImpl implements CustomerService {
 			}
 		} else {
 			generateOtp(customer.get().getCustomerId());
-			responseDto.setMessage("Otp details sent to your mobile");
+			responseDto.setMessage(FavoriteAccountConstants.OTP_SENT);
 		}
 	}
 

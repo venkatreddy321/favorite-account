@@ -107,10 +107,7 @@ public class CustomerServiceImpl implements CustomerService {
 		Integer bankCode = Integer.valueOf(accNumberWithoutSpace.substring(4, 8));
 
 		Optional<Bank> bankDetails = bankRepository.findById(bankCode);
-		if (!bankDetails.isPresent()) {
-			throw new IncorrectBankCodeException(FavoriteAccountConstants.BANK_CODE_DOES_NOT_EXIST);
-		}
-
+		
 		if (favoriteAccountRequest.getFavAccountId() > 0) {
 			return editFavoriteAccount(favoriteAccountRequest, bankDetails);
 
@@ -120,7 +117,11 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	public ResponseDto addFavoriteAccount(Integer customerId, FavoriteAccountRequest favoriteAccountRequest,
-			Optional<Bank> bankDetails) {
+			Optional<Bank> bankDetails) throws IncorrectBankCodeException {
+
+		if (!bankDetails.isPresent()) {
+			throw new IncorrectBankCodeException(FavoriteAccountConstants.BANK_CODE_DOES_NOT_EXIST);
+		}
 
 		ResponseDto responseDto = new ResponseDto();
 		FavoriteAccount favoriteAccount = new FavoriteAccount();
@@ -137,7 +138,11 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	public ResponseDto editFavoriteAccount(FavoriteAccountRequest favoriteAccountRequest, Optional<Bank> bankDetails)
-			throws FavoriteIdNotFoundException {
+			throws FavoriteIdNotFoundException, IncorrectBankCodeException {
+
+		if (!bankDetails.isPresent()) {
+			throw new IncorrectBankCodeException(FavoriteAccountConstants.BANK_CODE_DOES_NOT_EXIST);
+		}
 
 		ResponseDto responseDto = new ResponseDto();
 		Optional<FavoriteAccount> favAccount = favoriteAccountRepository

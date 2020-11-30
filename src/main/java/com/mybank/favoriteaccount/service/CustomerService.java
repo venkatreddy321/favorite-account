@@ -42,14 +42,15 @@ public interface CustomerService {
 
 	public ResponseDto updateFavoriteAccount(Integer customerId, FavoriteAccountRequest favoriteAccountRequest)
 			throws IncorrectBankCodeException, FavoriteIdNotFoundException, InvalidAccountNumberException;
-	
+
 	public ResponseDto deleteAccount(Integer customerId, String accNumber) throws InvalidAccountNumberException;
 
-	
 	default void validateAccountNumber(String accountNumber) throws InvalidAccountNumberException {
 
 		accountNumber = accountNumber.replaceAll("\\s+", "");
-
+		if (accountNumber.length() < 19) {
+			throw new InvalidAccountNumberException(FavoriteAccountConstants.INVALID_ACCOUNT_NUMBER);
+		}
 		Pattern pattern = Pattern.compile("^[a-zA-Z]{1,2}[0-9]{3,17}$");
 		if (!pattern.matcher(accountNumber).matches()) {
 			throw new InvalidAccountNumberException(FavoriteAccountConstants.INVALID_ACCOUNT_NUMBER);

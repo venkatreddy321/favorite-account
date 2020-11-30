@@ -1,4 +1,4 @@
-package com.mybank.favoriteaccount;
+package com.mybank.favoriteaccount.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -15,44 +15,60 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
-import com.mybank.favoriteaccount.controller.CustomerController;
 import com.mybank.favoriteaccount.dto.FavoriteAccountDto;
 import com.mybank.favoriteaccount.dto.FavoriteAccountsResponse;
-import com.mybank.favoriteaccount.dto.LoginRequest;
 import com.mybank.favoriteaccount.dto.ResponseDto;
-import com.mybank.favoriteaccount.exception.CustomerNotFoundException;
+import com.mybank.favoriteaccount.entity.Customer;
+import com.mybank.favoriteaccount.entity.FavoriteAccount;
 import com.mybank.favoriteaccount.exception.InvalidCustomerException;
-import com.mybank.favoriteaccount.service.CustomerService;
+import com.mybank.favoriteaccount.repository.CustomerRepository;
+import com.mybank.favoriteaccount.repository.FavoriteAccountRepository;
 import com.mybank.favoriteaccount.util.FavoriteAccountConstants;
 
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
-public class CustomerControllerTest {
+public class CustomerServiceImplTest {
 
 	@InjectMocks
-	CustomerController customerController;
+	CustomerServiceImpl customerServiceImpl;
 
 	@Mock
-	CustomerService customerService;
+	CustomerRepository customerRepository;
+
+	@Mock
+	FavoriteAccountRepository favoriteAccountRepository;
 
 	FavoriteAccountsResponse favoriteAccountsResponse;
 	FavoriteAccountDto favoriteAccount;
 	List<FavoriteAccountDto> favoriteAccounts;
 	ResponseDto responseDto;
+	List<FavoriteAccount> accounts;
+	FavoriteAccount account1;
+	FavoriteAccount account2;
 
-	LoginRequest loginRequest;
+	Customer customer;
 
 	@BeforeAll
-	public void setUp() {
+	private void setup() {
+		account1 = new FavoriteAccount();
+		account1.setCustomerId(1);
+		account1.setBankName("My bank");
+		account2 = new FavoriteAccount();
+		account2.setCustomerId(2);
+		accounts = new ArrayList<>();
+		accounts.add(account1);
+		accounts.add(account2);
+
 		responseDto = new ResponseDto();
 		responseDto.setMessage(FavoriteAccountConstants.CUSTOMER_LOGIN_SUCCESS);
 		responseDto.setStatus(HttpStatus.OK.value());
-		loginRequest = new LoginRequest();
-		loginRequest.setCustomerId(100);
-
+		customer = new Customer();
+		customer.setCustomerId(1000);
 		favoriteAccount = new FavoriteAccountDto();
 		favoriteAccount.setAccName("Savings");
 		favoriteAccount.setAccNumber("ES21 1234 0000 00 00000");
@@ -68,27 +84,28 @@ public class CustomerControllerTest {
 	}
 
 	@Test
-	public void favoriteAccountsTest() {
+	public void favoriteAccountRepositoryTest() {
 
-		// GIVEN
-		when(customerService.favoriteAccounts(1, 1)).thenReturn(favoriteAccountsResponse);
+		int pageNumber = 1;
+		int pageSize = 5;
+		Pageable pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by("accName"));
 
-		// WHEN
-		ResponseEntity<FavoriteAccountsResponse> actual = customerController.favoriteAccounts(1, 1);
+		when(favoriteAccountRepository.findByCustomerId(1, pageRequest)).thenReturn(Optional.of(accounts));
 
-		// THEN
-		assertEquals(favoriteAccountsResponse.getMessage(), actual.getBody().getMessage());
+		FavoriteAccountsResponse actual = customerServiceImpl.favoriteAccounts(1, 1);
+
+		assertEquals(favoriteAccountsResponse.getFavoriteAccount().get(0).getBankName(),
+				actual.getFavoriteAccount().get(0).getBankName());
+
 	}
 
 	@Test
-	void CustomerLoginTest() throws CustomerNotFoundException, InvalidCustomerException {
-		// GIVEN
-		when(customerService.loginUser(100)).thenReturn(Optional.of(responseDto));
-		// WHEN
-		ResponseEntity<Optional<ResponseDto>> actual = customerController.userLogin(loginRequest);
+	void loginUserTest() throws InvalidCustomerException {
+		when(customerRepository.findById(1000)).thenReturn(Optional.of(customer));
 
-		// THEN
-		assertEquals(responseDto.getMessage(), actual.getBody().get().getMessage());
+		Optional<ResponseDto> actual = customerServiceImpl.loginUser(1000);
+
+		assertEquals(responseDto.getMessage(), actual.get().getMessage());
 
 	}
 

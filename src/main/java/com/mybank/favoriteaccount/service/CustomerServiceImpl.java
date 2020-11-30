@@ -15,9 +15,15 @@ import org.springframework.stereotype.Service;
 
 import com.mybank.favoriteaccount.dto.FavoriteAccountDto;
 import com.mybank.favoriteaccount.dto.FavoriteAccountsResponse;
+import com.mybank.favoriteaccount.dto.ResponseDto;
+import com.mybank.favoriteaccount.entity.Customer;
 import com.mybank.favoriteaccount.entity.FavoriteAccount;
+import com.mybank.favoriteaccount.exception.InvalidCustomerException;
+import com.mybank.favoriteaccount.repository.CustomerRepository;
 import com.mybank.favoriteaccount.repository.FavoriteAccountRepository;
 import com.mybank.favoriteaccount.util.FavoriteAccountConstants;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation of CustomerService will have the customer favorite accounts
@@ -26,11 +32,15 @@ import com.mybank.favoriteaccount.util.FavoriteAccountConstants;
  * @author Kiruthika && prem
  * @since 2020/11/30
  */
+@Slf4j
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	FavoriteAccountRepository favoriteAccountRepository;
+	
+	@Autowired
+	private CustomerRepository customerRepository;
 
 	/**
 	 * Method to call service method to get the favorite accounts for the given
@@ -43,7 +53,7 @@ public class CustomerServiceImpl implements CustomerService {
 	 * 
 	 */
 	public FavoriteAccountsResponse favoriteAccounts(Integer customerId, Integer pageNumber) {
-
+		
 		Integer pageSize = 5;
 		Pageable pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by("accName"));
 
@@ -55,9 +65,8 @@ public class CustomerServiceImpl implements CustomerService {
 
 		if (favoriteAccounts.isPresent()) {
 
-			FavoriteAccountDto favoriteAccountDto = new FavoriteAccountDto();
-
 			favoriteAccountDtos = favoriteAccounts.get().stream().map(favAccount -> {
+				FavoriteAccountDto favoriteAccountDto = new FavoriteAccountDto();
 				BeanUtils.copyProperties(favAccount, favoriteAccountDto);
 				return favoriteAccountDto;
 			}).collect(Collectors.toList());
@@ -71,5 +80,21 @@ public class CustomerServiceImpl implements CustomerService {
 		accountsResponse.setStatusCode(HttpStatus.OK.value());
 		return accountsResponse;
 
+	}
+
+
+	@Override
+	public Optional<ResponseDto> loginUser(int customerId) throws InvalidCustomerException {
+		Optional<Customer> customer = customerRepository.findById(customerId);
+
+		if (!customer.isPresent()) {
+			throw new InvalidCustomerException(FavoriteAccountConstants.CUSTOMER_DOES_NOT_EXISTS);
+		} 
+		
+
+		ResponseDto responseDto= new ResponseDto();
+		responseDto.setMessage(FavoriteAccountConstants.CUSTOMER_LOGIN_SUCCESS);
+		responseDto.setStatus(HttpStatus.OK.value());
+		return Optional.of(responseDto);
 	}
 }

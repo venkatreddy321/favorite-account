@@ -82,16 +82,21 @@ public class CustomerServiceImpl implements CustomerService {
 
 	}
 
-
+	/**
+	 * Method to call service method to check the customer validation for the given
+	 * customer id and password
+	 * 
+	 * @param customerId id of the customer who wants to logged in .
+	 * @return responsedto which consist the message ,status code 
+	 */
 	@Override
-	public Optional<ResponseDto> loginUser(int customerId) throws InvalidCustomerException {
+	public Optional<ResponseDto> loginUser(int customerId,String password) throws InvalidCustomerException {
 		Optional<Customer> customer = customerRepository.findById(customerId);
 
 		if (!customer.isPresent()) {
 			throw new InvalidCustomerException(FavoriteAccountConstants.CUSTOMER_DOES_NOT_EXISTS);
 		} 
 		
-
 		ResponseDto responseDto= new ResponseDto();
 		responseDto.setMessage(FavoriteAccountConstants.CUSTOMER_LOGIN_SUCCESS);
 		responseDto.setStatus(HttpStatus.OK.value());

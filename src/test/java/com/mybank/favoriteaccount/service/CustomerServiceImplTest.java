@@ -1,6 +1,8 @@
 package com.mybank.favoriteaccount.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -101,12 +103,12 @@ public class CustomerServiceImplTest {
 
 	@Test
 	void loginUserTest() throws InvalidCustomerException {
+		
 		when(customerRepository.findById(1000)).thenReturn(Optional.of(customer));
-
-		Optional<ResponseDto> actual = customerServiceImpl.loginUser(1000);
-
+		Optional<ResponseDto> actual = customerServiceImpl.loginUser(1000,"siva");
 		assertEquals(responseDto.getMessage(), actual.get().getMessage());
-
+		assertEquals(true, responseDto.getStatus().equals(actual.get().getStatus()));
+		assertNotNull(customer);
 	}
 
 }

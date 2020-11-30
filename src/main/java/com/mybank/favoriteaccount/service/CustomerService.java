@@ -31,6 +31,13 @@ public interface CustomerService {
 	 * 
 	 */
 	public FavoriteAccountsResponse favoriteAccounts(Integer customerId, Integer pageNumber);
-
-	public Optional<ResponseDto> loginUser(int customerId) throws InvalidCustomerException;
+	/**
+	 * Method to call service method to check the customer validation for the given
+	 * customer id and password
+	 * 
+	 * @param customerId id of the customer who is going to log in .
+	 * @return responsedto which consist the message ,status code 
+	 */
+	
+	public Optional<ResponseDto> loginUser(int customerId,String password) throws InvalidCustomerException;
 }

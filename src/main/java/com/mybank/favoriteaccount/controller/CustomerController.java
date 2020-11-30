@@ -53,10 +53,18 @@ public class CustomerController {
 
 	}
 	
+	/**
+	 * Method to call service method to get login details for the given customer id and password.
+	 * 
+	 * @param customerId id of the customer who is going to log in .
+	 * @return response dto which consist the message ,status code 
+	 * 
+	 */
+	
 	@PostMapping("/login")
 	public ResponseEntity<Optional<ResponseDto>> userLogin(@RequestBody LoginRequest customer) throws InvalidCustomerException {
 
-		return new ResponseEntity<>(customerService.loginUser(customer.getCustomerId()), HttpStatus.OK);
+		return new ResponseEntity<>(customerService.loginUser(customer.getCustomerId(),customer.getPassword()), HttpStatus.OK);
 
 	}
 

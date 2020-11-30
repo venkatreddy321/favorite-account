@@ -33,6 +33,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(errorResponse, HttpStatus.OK);
 
 	}
+	@ExceptionHandler(AccountNotFoundException.class)
+	public ResponseEntity<ErrorResponse> accountNumberNotFoundExceptionHandler(AccountNotFoundException exception, WebRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), HttpStatus.NOT_FOUND.value()
+				);
+		return new ResponseEntity<>(errorResponse, HttpStatus.OK);
 
+	}
 	
 }

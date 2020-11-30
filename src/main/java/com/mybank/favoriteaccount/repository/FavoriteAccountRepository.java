@@ -10,8 +10,12 @@ import org.springframework.stereotype.Repository;
 import com.mybank.favoriteaccount.entity.FavoriteAccount;
 
 @Repository
-public interface FavoriteAccountRepository extends JpaRepository<FavoriteAccount, Integer>{
+public interface FavoriteAccountRepository extends JpaRepository<FavoriteAccount, Integer> {
 
 	Optional<List<FavoriteAccount>> findByCustomerId(Integer customerId, Pageable pageRequest);
+
+	Optional<FavoriteAccount> findByAccNumber(String accNumber);
+
+	Optional<FavoriteAccount> findByCustomerIdAndAccNumber(Integer customerId, String accNumber);
 
 }

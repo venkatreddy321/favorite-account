@@ -16,6 +16,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				HttpStatus.INTERNAL_SERVER_ERROR.value());
 		return new ResponseEntity<>(errorResponse, HttpStatus.OK);
 	}
+	
+	
+	@ExceptionHandler(InvalidCustomerException.class)
+	public ResponseEntity<ErrorResponse> invalidUserExceptionHandler(InvalidCustomerException exception, WebRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), HttpStatus.BAD_REQUEST.value()
+				);
+		return new ResponseEntity<>(errorResponse, HttpStatus.OK);
+
+	}
+	@ExceptionHandler(CustomerNotFoundException.class)
+	public ResponseEntity<ErrorResponse> CustomerNotFoundException(CustomerNotFoundException exception, WebRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), HttpStatus.BAD_REQUEST.value()
+				);
+		return new ResponseEntity<>(errorResponse, HttpStatus.OK);
+
+	}
 
 	
 }

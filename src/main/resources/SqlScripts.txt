@@ -1,0 +1,9 @@
+insert into customer (customer_id, name, password) values (4567, 'SaravanaPandiyan', 'fav@123');
+insert into customer (customer_id, name, password) values (4561, 'Siva', 'fav@123');
+insert into customer (customer_id, name, password) values (4562, 'Prem', 'fav@123');
+insert into customer (customer_id, name, password) values (4563, 'Kiruthika', 'fav@123');
+
+insert into bank (bank_code, bank_name) values (1234, 'Nairobi Bank');
+insert into bank (bank_code, bank_name) values (1235, 'Denver Bank');
+insert into bank (bank_code, bank_name) values (1236, 'Moscow Bank');
+insert into bank (bank_code, bank_name) values (1237, 'Tokio Bank');

@@ -1,12 +1,18 @@
 package com.mybank.favoriteaccount.service;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 
+import com.mybank.favoriteaccount.dto.FavoriteAccountRequest;
 import com.mybank.favoriteaccount.dto.FavoriteAccountsResponse;
 import com.mybank.favoriteaccount.dto.ResponseDto;
+import com.mybank.favoriteaccount.exception.FavoriteIdNotFoundException;
+import com.mybank.favoriteaccount.exception.IncorrectBankCodeException;
+import com.mybank.favoriteaccount.exception.InvalidAccountNumberException;
 import com.mybank.favoriteaccount.exception.InvalidCustomerException;
+import com.mybank.favoriteaccount.util.FavoriteAccountConstants;
 
 /**
  * 
@@ -33,4 +39,18 @@ public interface CustomerService {
 	public FavoriteAccountsResponse favoriteAccounts(Integer customerId, Integer pageNumber);
 
 	public Optional<ResponseDto> loginUser(int customerId) throws InvalidCustomerException;
+
+	public ResponseDto updateFavoriteAccount(Integer customerId, FavoriteAccountRequest favoriteAccountRequest)
+			throws IncorrectBankCodeException, FavoriteIdNotFoundException, InvalidAccountNumberException;
+
+	
+	default void validateAccountNumber(String accountNumber) throws InvalidAccountNumberException {
+
+		accountNumber = accountNumber.replaceAll("\\s+", "");
+
+		Pattern pattern = Pattern.compile("^[a-zA-Z]{1,2}[0-9]{3,17}$");
+		if (!pattern.matcher(accountNumber).matches()) {
+			throw new InvalidAccountNumberException(FavoriteAccountConstants.INVALID_ACCOUNT_NUMBER);
+		}
+	}
 }

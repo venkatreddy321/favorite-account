@@ -14,4 +14,6 @@ public interface FavoriteAccountRepository extends JpaRepository<FavoriteAccount
 
 	Optional<List<FavoriteAccount>> findByCustomerId(Integer customerId, Pageable pageRequest);
 
+	Optional<FavoriteAccount> findByCustomerIdAndAccNumber(Integer customerId, String accNumber);
+
 }

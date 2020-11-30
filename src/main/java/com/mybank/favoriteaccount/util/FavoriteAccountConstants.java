@@ -10,4 +10,10 @@ public class FavoriteAccountConstants {
 	public static final String FAVORITE_ACCOUNT_EMPTY_RESPONSE="Favorite accounts is empty ";
 	public static final String CUSTOMER_LOGIN_SUCCESS="customer looged in successfully";
 	public static final String CUSTOMER_DOES_NOT_EXISTS="customer does not exist";
+	public static final String FAVORITE_ACCOUNT_ADDED="favorite account added successfully";
+	public static final String FAVORITE_ACCOUNT_UPDATED="favorite account updated successfully";
+	public static final String BANK_CODE_DOES_NOT_EXIST="bank code does not exist";
+	public static final String FAVORITE_ACCOUNT_DOES_NOT_EXIST="favourite account does not exist";
+	public static final String INVALID_ACCOUNT_NUMBER="Invalid account number";
+	
 }

@@ -42,6 +42,8 @@ public interface CustomerService {
 
 	public ResponseDto updateFavoriteAccount(Integer customerId, FavoriteAccountRequest favoriteAccountRequest)
 			throws IncorrectBankCodeException, FavoriteIdNotFoundException, InvalidAccountNumberException;
+	
+	public ResponseDto deleteAccount(Integer customerId, String accNumber) throws InvalidAccountNumberException;
 
 	
 	default void validateAccountNumber(String accountNumber) throws InvalidAccountNumberException {

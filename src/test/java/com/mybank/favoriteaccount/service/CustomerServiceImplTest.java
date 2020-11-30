@@ -3,6 +3,7 @@ package com.mybank.favoriteaccount.service;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import com.mybank.favoriteaccount.dto.FavoriteAccountsResponse;
 import com.mybank.favoriteaccount.dto.ResponseDto;
 import com.mybank.favoriteaccount.entity.Customer;
 import com.mybank.favoriteaccount.entity.FavoriteAccount;
+import com.mybank.favoriteaccount.exception.InvalidAccountNumberException;
 import com.mybank.favoriteaccount.exception.InvalidCustomerException;
 import com.mybank.favoriteaccount.repository.CustomerRepository;
 import com.mybank.favoriteaccount.repository.FavoriteAccountRepository;
@@ -52,9 +54,26 @@ public class CustomerServiceImplTest {
 	FavoriteAccount account2;
 
 	Customer customer;
+	private Integer customerId = 1;
+	private String accNumber = "ES21123500000000000";
+	ResponseDto responseDto1;
+	FavoriteAccount favoriteAccount1;
 
 	@BeforeAll
 	private void setup() {
+		
+		responseDto1 = new ResponseDto();
+		responseDto1.setMessage("Account number deleted successfully");
+		responseDto1.setStatus(200);
+		
+		favoriteAccount1 = new FavoriteAccount();
+		favoriteAccount1.setAccName("vodafonespain");
+		favoriteAccount1.setAccNumber("ES21123500000000000");
+		favoriteAccount1.setBankName("bbva");
+		favoriteAccount1.setCustomerId(1);
+		favoriteAccount1.setFavAccountId(3);
+		favoriteAccount1.setUpdatedDate(LocalDateTime.now());
+		
 		account1 = new FavoriteAccount();
 		account1.setCustomerId(1);
 		account1.setBankName("My bank");
@@ -107,6 +126,20 @@ public class CustomerServiceImplTest {
 
 		assertEquals(responseDto.getMessage(), actual.get().getMessage());
 
+	}
+	@Test
+	public void deleteAccountTest() throws InvalidAccountNumberException {
+		
+		//Given
+		when(favoriteAccountRepository.findByCustomerIdAndAccNumber(customerId, accNumber))
+		.thenReturn(Optional.of(favoriteAccount1));
+		
+		//when
+		ResponseDto actual = customerServiceImpl.deleteAccount(customerId, accNumber);
+		
+		//then
+		assertEquals("Account number deleted successfully",actual.getMessage());
+	
 	}
 
 }

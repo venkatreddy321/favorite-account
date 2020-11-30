@@ -1,4 +1,4 @@
-package com.mybank.favoriteaccount;
+package com.mybank.favoriteaccount.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +23,7 @@ import com.mybank.favoriteaccount.dto.ResponseDto;
 import com.mybank.favoriteaccount.entity.Bank;
 import com.mybank.favoriteaccount.entity.Customer;
 import com.mybank.favoriteaccount.entity.FavoriteAccount;
+import com.mybank.favoriteaccount.exception.AccountNotFoundException;
 import com.mybank.favoriteaccount.exception.FavoriteIdNotFoundException;
 import com.mybank.favoriteaccount.exception.IncorrectBankCodeException;
 import com.mybank.favoriteaccount.exception.InvalidAccountNumberException;
@@ -42,6 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class CustomerServiceImpl implements CustomerService {
+
+	private static final Logger logger = LoggerFactory.getLogger(CustomerServiceImpl.class);
 
 	@Autowired
 	FavoriteAccountRepository favoriteAccountRepository;
@@ -84,11 +89,9 @@ public class CustomerServiceImpl implements CustomerService {
 			accountsResponse.setMessage(FavoriteAccountConstants.FAVORITE_ACCOUNT_RESPONSE);
 
 		} else {
-
-			accountsResponse.setFavoriteAccount(favoriteAccountDtos);
 			accountsResponse.setMessage(FavoriteAccountConstants.FAVORITE_ACCOUNT_EMPTY_RESPONSE);
 		}
-
+		accountsResponse.setFavoriteAccount(favoriteAccountDtos);
 		accountsResponse.setStatusCode(HttpStatus.OK.value());
 		return accountsResponse;
 
@@ -111,10 +114,9 @@ public class CustomerServiceImpl implements CustomerService {
 		if (favoriteAccountRequest.getFavAccountId() > 0) {
 			return editFavoriteAccount(favoriteAccountRequest, bankDetails);
 
-		}
-		else{
+		} else {
 			return addFavoriteAccount(customerId, favoriteAccountRequest, bankDetails);
-		} 
+		}
 	}
 
 	public ResponseDto addFavoriteAccount(Integer customerId, FavoriteAccountRequest favoriteAccountRequest,
@@ -167,5 +169,36 @@ public class CustomerServiceImpl implements CustomerService {
 		responseDto.setMessage(FavoriteAccountConstants.CUSTOMER_LOGIN_SUCCESS);
 		responseDto.setStatus(HttpStatus.OK.value());
 		return Optional.of(responseDto);
+	}
+
+	/**
+	 * Method to call service method to delete the favorite accounts for the given
+	 * customer id.
+	 * 
+	 * @param customerId id of the customer who logged in .
+	 * @param account    number of the customer who is having favorite account .
+	 * @return ResponseDto which consist the message ,status code is the return type
+	 *         of this method
+	 * @throws InvalidAccountNumberException
+	 * 
+	 * 
+	 */
+
+	@Override
+	public ResponseDto deleteAccount(Integer customerId, String accNumber) throws InvalidAccountNumberException {
+		logger.info("deleteAccount in service started");
+		validateAccountNumber(accNumber);
+		Optional<FavoriteAccount> account = favoriteAccountRepository.findByCustomerIdAndAccNumber(customerId,
+				accNumber);
+
+		if (!account.isPresent()) {
+			throw new AccountNotFoundException(FavoriteAccountConstants.ACCOUNT_NOT_FOUND);
+		}
+		favoriteAccountRepository.deleteById(account.get().getFavAccountId());
+
+		ResponseDto responseDto = new ResponseDto();
+		responseDto.setMessage(FavoriteAccountConstants.ACCOUNT_DELETED);
+		responseDto.setStatus(HttpStatus.OK.value());
+		return responseDto;
 	}
 }

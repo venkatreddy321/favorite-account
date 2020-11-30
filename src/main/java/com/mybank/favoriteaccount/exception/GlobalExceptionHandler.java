@@ -1,5 +1,7 @@
 package com.mybank.favoriteaccount.exception;
 
+import javax.security.auth.login.AccountNotFoundException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -53,6 +55,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<ErrorResponse> invalidAccountNumberExceptionHandler(InvalidAccountNumberException exception,
 			WebRequest request) {
 		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), HttpStatus.BAD_REQUEST.value());
+		return new ResponseEntity<>(errorResponse, HttpStatus.OK);
+
+	}
+	@ExceptionHandler(AccountNotFoundException.class)
+	public ResponseEntity<ErrorResponse> accountNumberNotFoundExceptionHandler(AccountNotFoundException exception, WebRequest request) {
+		ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), HttpStatus.NOT_FOUND.value()
+				);
 		return new ResponseEntity<>(errorResponse, HttpStatus.OK);
 
 	}

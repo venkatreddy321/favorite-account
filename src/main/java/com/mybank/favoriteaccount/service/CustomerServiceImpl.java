@@ -19,12 +19,29 @@ import com.mybank.favoriteaccount.entity.FavoriteAccount;
 import com.mybank.favoriteaccount.repository.FavoriteAccountRepository;
 import com.mybank.favoriteaccount.util.FavoriteAccountConstants;
 
+/**
+ * Implementation of CustomerService will have the customer favorite accounts
+ * related operations.
+ * 
+ * @author Kiruthika && prem
+ * @since 2020/11/30
+ */
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	FavoriteAccountRepository favoriteAccountRepository;
 
+	/**
+	 * Method to call service method to get the favorite accounts for the given
+	 * customer id.
+	 * 
+	 * @param customerId id of the customer who logged in .
+	 * @param pageNumber page number for navigate the pages .
+	 * @return FavoriteAccountsResponse which consist the message ,status code with
+	 *         list of favorite accounts.
+	 * 
+	 */
 	public FavoriteAccountsResponse favoriteAccounts(Integer customerId, Integer pageNumber) {
 
 		Integer pageSize = 5;
@@ -34,22 +51,21 @@ public class CustomerServiceImpl implements CustomerService {
 				pageRequest);
 
 		FavoriteAccountsResponse accountsResponse = new FavoriteAccountsResponse();
-		List<FavoriteAccountDto> favoriteAccountDtos=new ArrayList<>();
-		
-		if(favoriteAccounts.isPresent()) {
-			
-		FavoriteAccountDto favoriteAccountDto = new FavoriteAccountDto();
-		
-		favoriteAccountDtos = favoriteAccounts.get().stream().map(favAccount -> {
-			BeanUtils.copyProperties(favAccount, favoriteAccountDto);
-			return favoriteAccountDto;
-		}).collect(Collectors.toList());
-		
-		
-		accountsResponse.setMessage(FavoriteAccountConstants.FAVORITE_ACCOUNT_RESPONSE);
-		
+		List<FavoriteAccountDto> favoriteAccountDtos = new ArrayList<>();
+
+		if (favoriteAccounts.isPresent()) {
+
+			FavoriteAccountDto favoriteAccountDto = new FavoriteAccountDto();
+
+			favoriteAccountDtos = favoriteAccounts.get().stream().map(favAccount -> {
+				BeanUtils.copyProperties(favAccount, favoriteAccountDto);
+				return favoriteAccountDto;
+			}).collect(Collectors.toList());
+
+			accountsResponse.setMessage(FavoriteAccountConstants.FAVORITE_ACCOUNT_RESPONSE);
+
 		}
-		
+
 		accountsResponse.setFavoriteAccount(favoriteAccountDtos);
 		accountsResponse.setMessage(FavoriteAccountConstants.FAVORITE_ACCOUNT_EMPTY_RESPONSE);
 		accountsResponse.setStatusCode(HttpStatus.OK.value());

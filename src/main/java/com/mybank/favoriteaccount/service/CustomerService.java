@@ -39,5 +39,5 @@ public interface CustomerService {
 	 * @return responsedto which consist the message ,status code 
 	 */
 	
-	public Optional<ResponseDto> loginUser(int customerId,String password) throws InvalidCustomerException;
+	public Optional<ResponseDto> loginUser(int customerId,String password, Integer otp) throws InvalidCustomerException;
 }

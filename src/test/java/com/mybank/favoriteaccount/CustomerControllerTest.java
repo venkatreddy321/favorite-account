@@ -84,7 +84,7 @@ public class CustomerControllerTest {
 	@Test
 	void customerLoginTest() throws CustomerNotFoundException, InvalidCustomerException {
 		// GIVEN
-		when(customerService.loginUser(100,"siva")).thenReturn(Optional.of(responseDto));
+		when(customerService.loginUser(4567,"fav@123", null)).thenReturn(Optional.of(responseDto));
 		// WHEN
 		ResponseEntity<Optional<ResponseDto>> actual = customerController.userLogin(loginRequest);
 

@@ -1,10 +1,13 @@
 package com.mybank.favoriteaccount.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -18,9 +21,11 @@ import com.mybank.favoriteaccount.dto.FavoriteAccountsResponse;
 import com.mybank.favoriteaccount.dto.ResponseDto;
 import com.mybank.favoriteaccount.entity.Customer;
 import com.mybank.favoriteaccount.entity.FavoriteAccount;
+import com.mybank.favoriteaccount.entity.OtpDetails;
 import com.mybank.favoriteaccount.exception.InvalidCustomerException;
 import com.mybank.favoriteaccount.repository.CustomerRepository;
 import com.mybank.favoriteaccount.repository.FavoriteAccountRepository;
+import com.mybank.favoriteaccount.repository.OtpRepository;
 import com.mybank.favoriteaccount.util.FavoriteAccountConstants;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +43,9 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	FavoriteAccountRepository favoriteAccountRepository;
+
+	@Autowired
+	OtpRepository otpRepository;
 	
 	@Autowired
 	private CustomerRepository customerRepository;
@@ -90,16 +98,55 @@ public class CustomerServiceImpl implements CustomerService {
 	 * @return responsedto which consist the message ,status code 
 	 */
 	@Override
-	public Optional<ResponseDto> loginUser(int customerId,String password) throws InvalidCustomerException {
+	public Optional<ResponseDto> loginUser(int customerId,String password, Integer otp) throws InvalidCustomerException {
 		Optional<Customer> customer = customerRepository.findById(customerId);
 
 		if (!customer.isPresent()) {
 			throw new InvalidCustomerException(FavoriteAccountConstants.CUSTOMER_DOES_NOT_EXISTS);
-		} 
-		
+		}
 		ResponseDto responseDto= new ResponseDto();
-		responseDto.setMessage(FavoriteAccountConstants.CUSTOMER_LOGIN_SUCCESS);
+		if(StringUtils.isBlank(password) && otp==null){
+			throw new InvalidCustomerException(FavoriteAccountConstants.MISSING_CREDENTIALS);
+		}else if(StringUtils.isNotBlank(password)) {
+			if (!customer.get().getPassword().equals(password)) {
+				throw new InvalidCustomerException(FavoriteAccountConstants.INVALID_CREDENTIALS);
+			}
+			responseDto.setMessage(FavoriteAccountConstants.CUSTOMER_LOGIN_SUCCESS);
+		}else {
+			validteOtp(customerId, otp, customer, responseDto);
+		}
+
 		responseDto.setStatus(HttpStatus.OK.value());
 		return Optional.of(responseDto);
+	}
+	private void validteOtp(int customerId, Integer otp, Optional<Customer> customer, ResponseDto responseDto) throws InvalidCustomerException {
+		if (null != otp && otp != 0) {
+			Optional<OtpDetails> otpDetail = otpRepository.findByOtp(otp, customerId);
+			if (!otpDetail.isPresent()) {
+				throw new InvalidCustomerException(FavoriteAccountConstants.INVALID_OTP);
+			}
+			if (customerId == otpDetail.get().getCustomerId()) {
+				responseDto.setMessage(FavoriteAccountConstants.CUSTOMER_LOGIN_SUCCESS);
+			}
+		} else {
+			generateOtp(customer.get().getCustomerId());
+			responseDto.setMessage("Otp details sent to your mobile");
+		}
+	}
+
+	private void generateOtp(Integer customerId) {
+		String values = "0123456789";
+		int otpLength = 5;
+		Random rndm_method = new Random();
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < otpLength; i++) {
+			sb.append(values.charAt(rndm_method.nextInt(values.length())));
+		}
+		OtpDetails otpDetails = new OtpDetails();
+		otpDetails.setCreatedOn(LocalDateTime.now());
+		otpDetails.setOtp(Integer.parseInt(sb.toString()));
+		otpDetails.setCustomerId(customerId);
+		otpRepository.save(otpDetails);
+		// sendOtp(sb.toString());//TO DO with SMS integration here
 	}
 }

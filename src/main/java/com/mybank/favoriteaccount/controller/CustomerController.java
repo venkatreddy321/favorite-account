@@ -64,7 +64,7 @@ public class CustomerController {
 	@PostMapping("/login")
 	public ResponseEntity<Optional<ResponseDto>> userLogin(@RequestBody LoginRequest customer) throws InvalidCustomerException {
 
-		return new ResponseEntity<>(customerService.loginUser(customer.getCustomerId(),customer.getPassword()), HttpStatus.OK);
+		return new ResponseEntity<>(customerService.loginUser(customer.getCustomerId(),customer.getPassword(), customer.getOtp()), HttpStatus.OK);
 
 	}
 

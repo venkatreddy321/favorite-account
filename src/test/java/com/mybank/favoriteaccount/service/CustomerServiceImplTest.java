@@ -2,7 +2,6 @@ package com.mybank.favoriteaccount.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -70,7 +69,8 @@ public class CustomerServiceImplTest {
 		responseDto.setMessage(FavoriteAccountConstants.CUSTOMER_LOGIN_SUCCESS);
 		responseDto.setStatus(HttpStatus.OK.value());
 		customer = new Customer();
-		customer.setCustomerId(1000);
+		customer.setCustomerId(4567);
+		customer.setPassword("fav@123");
 		favoriteAccount = new FavoriteAccountDto();
 		favoriteAccount.setAccName("Savings");
 		favoriteAccount.setAccNumber("ES21 1234 0000 00 00000");
@@ -103,9 +103,18 @@ public class CustomerServiceImplTest {
 
 	@Test
 	void loginUserTest() throws InvalidCustomerException {
-		
-		when(customerRepository.findById(1000)).thenReturn(Optional.of(customer));
-		Optional<ResponseDto> actual = customerServiceImpl.loginUser(1000,"siva");
+
+		when(customerRepository.findById(4567)).thenReturn(Optional.of(customer));
+		Optional<ResponseDto> actual = customerServiceImpl.loginUser(4567, "fav@123", null);
+		assertEquals(responseDto.getMessage(), actual.get().getMessage());
+		assertEquals(true, responseDto.getStatus().equals(actual.get().getStatus()));
+		assertNotNull(customer);
+	}
+
+	@Test
+	void otpLoginUserTest() throws InvalidCustomerException {
+		when(customerRepository.findById(4567)).thenReturn(Optional.of(customer));
+		Optional<ResponseDto> actual = customerServiceImpl.loginUser(4567, "fav@123", null);
 		assertEquals(responseDto.getMessage(), actual.get().getMessage());
 		assertEquals(true, responseDto.getStatus().equals(actual.get().getStatus()));
 		assertNotNull(customer);
